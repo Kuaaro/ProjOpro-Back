@@ -11,6 +11,7 @@ public sealed class DataSet
 	public string? ContactPoint { get; set; }
 
 	public int SchemaId { get; set; }
+	
 	public Schema? Schema { get; set; }
 
 	public List<Distribution> Distribution { get; set; } = [];

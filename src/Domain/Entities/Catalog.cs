@@ -6,8 +6,7 @@ public sealed class Catalog
 
 	public string Name { get; set; } = default!;
 
-	public string? Description { get; set; }
-
+	public string Description { get; set; } = default!;
 	
 	public int ParentId { get; set; }
 
@@ -16,4 +15,13 @@ public sealed class Catalog
 	public List<Catalog> Children { get; set; } = [];
 
 	public List<DataSet> DataSets { get; set; } = [];
+	
+	private Catalog(){}
+	
+	public Catalog (string name, string description, int parentId)
+	{
+		Name = name;
+		Description = description;
+		ParentId = parentId;
+	}
 }
