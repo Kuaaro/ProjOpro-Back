@@ -1,0 +1,43 @@
+using Application.Schemas.Models.CreateSchema;
+using Application.Schemas.Models.GetSchema;
+using Application.Schemas.Models.GetSchemaList;
+using Application.Schemas.Models.ModifySchema;
+using Microsoft.AspNetCore.Mvc;
+
+namespace Api.Controllers;
+
+[ApiController]
+[Route("schemas")]
+public sealed class SchemaController : ControllerBase
+{
+	[HttpGet("list")]
+	[ProducesResponseType<GetSchemaListResponse>(200)]
+	public async Task<IActionResult> GetSchemaList()
+	{
+		return Ok();
+	}
+
+	[HttpGet("{id}")]
+	[ProducesResponseType<GetSchemaResponse>(200)]
+	public async Task<IActionResult> GetSchema(int id)
+	{
+		return Ok();
+	}
+
+	[HttpPost]
+	[ProducesResponseType<CreateSchemaResponse>(201)]
+	public async Task<IActionResult> CreateSchema(
+		[FromBody] CreateSchemaRequest body)
+	{
+		return Created(string.Empty, null);
+	}
+
+	[HttpPut("{id}")]
+	public async Task<IActionResult> ModifySchema(
+		int id,
+		[FromBody] ModifySchemaRequest body)
+	{
+		return NoContent();
+	}
+}
+
