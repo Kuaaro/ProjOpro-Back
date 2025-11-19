@@ -19,6 +19,7 @@ public static class DependencyInjectionExtension
 		
 		services.AddScoped<ICatalogRepository, CatalogRepository>();
 		services.AddScoped<IDatasetRepository, DatasetRepository>();
+		services.AddScoped<ISchemaRepository, SchemaRepository>();
 		return services;
 	}
 }
