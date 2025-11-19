@@ -18,6 +18,7 @@ public static class DependencyInjectionExtension
 		});
 		
 		services.AddScoped<ICatalogRepository, CatalogRepository>();
+		services.AddScoped<IDatasetRepository, DatasetRepository>();
 		return services;
 	}
 }

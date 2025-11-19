@@ -13,7 +13,8 @@ public sealed class CatalogController(ICatalogService catalogService) : Controll
 	[ProducesResponseType<GetCatalogChildrenResponse>(200)]
 	public async Task<IActionResult> GetCatalogChildren(int id)
 	{
-		return Ok();
+        var response = await catalogService.GetCatalogChildren(id);
+        return Ok(response);
 	}
 
 	[HttpPost]

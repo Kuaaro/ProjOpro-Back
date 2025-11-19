@@ -17,4 +17,6 @@ public sealed class DataSet
 	public List<Distribution> Distribution { get; set; } = [];
 
 	public List<string> Keywords { get; set; } = [];
+
+	public int ParentId { get; set; }
 }
