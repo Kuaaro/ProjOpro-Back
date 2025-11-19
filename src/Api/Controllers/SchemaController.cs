@@ -32,7 +32,8 @@ public sealed class SchemaController(ISchemaService schemaService) : ControllerB
 	public async Task<IActionResult> CreateSchema(
 		[FromBody] CreateSchemaRequest body)
 	{
-		return Created(string.Empty, null);
+        var response = await schemaService.CreateSchema(body);
+        return Created(string.Empty, response);
 	}
 
 	[HttpPut("{id}")]

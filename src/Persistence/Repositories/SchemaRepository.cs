@@ -11,6 +11,9 @@ internal sealed class SchemaRepository(ApplicationDbContext dbContext)
     public Task SaveChanges(CancellationToken cancellationToken)
         => dbContext.SaveChangesAsync(cancellationToken);
 
+    public void Add(Schema schema)
+        => dbContext.Schemas.Add(schema);
+
     public async Task<List<Schema>> GetAll()
     {
         return await dbContext.Schemas
