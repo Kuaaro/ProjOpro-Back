@@ -1,4 +1,5 @@
 using Application.Catalogs;
+using Application.Datasets;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Application;
@@ -9,6 +10,7 @@ public static class DependencyInjectionExtension
 	{
 		// Register application services, validators, and configurations here
 		services.AddScoped<ICatalogService, CatalogService>();
-		return services;
+        services.AddScoped<IDatasetService, DatasetService>();
+        return services;
 	}
 }
