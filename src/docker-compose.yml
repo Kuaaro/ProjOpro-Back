@@ -18,7 +18,7 @@ services:
   frontend:
     build:
       context: ./ProjOprog-Front/proj_oprog_front
-      dockerfile: Dockerfile
+      dockerfile: docker/Dockerfile
       args:
         # Empty string = relative URLs (proxied by nginx to api service)
         API_BASE_URL: ""
