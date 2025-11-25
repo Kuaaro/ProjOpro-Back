@@ -1,3 +1,5 @@
+using Application.Catalogs;
+using Application.Schemas;
 using Application.Schemas.Models.CreateSchema;
 using Application.Schemas.Models.GetSchema;
 using Application.Schemas.Models.GetSchemaList;
@@ -8,13 +10,14 @@ namespace Api.Controllers;
 
 [ApiController]
 [Route("schemas")]
-public sealed class SchemaController : ControllerBase
+public sealed class SchemaController(ISchemaService schemaService) : ControllerBase
 {
 	[HttpGet("list")]
 	[ProducesResponseType<GetSchemaListResponse>(200)]
 	public async Task<IActionResult> GetSchemaList()
 	{
-		return Ok();
+        var response = await schemaService.GetSchemaListAsync();
+        return Ok(response);
 	}
 
 	[HttpGet("{id}")]
@@ -29,7 +32,8 @@ public sealed class SchemaController : ControllerBase
 	public async Task<IActionResult> CreateSchema(
 		[FromBody] CreateSchemaRequest body)
 	{
-		return Created(string.Empty, null);
+        var response = await schemaService.CreateSchema(body);
+        return Created(string.Empty, response);
 	}
 
 	[HttpPut("{id}")]
