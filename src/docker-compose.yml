@@ -1,0 +1,36 @@
+services:
+  # Backend API Service
+  api:
+    build:
+      context: ./ProjOpro-Back/src
+      dockerfile: Dockerfile
+    container_name: projopro-api
+    ports:
+      - "5056:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:8080
+    networks:
+      - projopro-network
+    restart: unless-stopped
+
+  # Frontend: Builds Flutter app and serves it with nginx
+  frontend:
+    build:
+      context: ./ProjOprog-Front/proj_oprog_front
+      dockerfile: docker/Dockerfile
+      args:
+        API_BASE_URL: ""
+    container_name: projopro-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - api
+    networks:
+      - projopro-network
+    restart: unless-stopped
+
+networks:
+  projopro-network:
+    driver: bridge
+
