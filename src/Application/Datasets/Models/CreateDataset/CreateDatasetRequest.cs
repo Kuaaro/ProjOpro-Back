@@ -6,5 +6,6 @@ public sealed record CreateDatasetRequest(
 	string ContactPoint,
 	List<string> Keywords,
 	List<DistributionFull> Distributions,
-	int SchemaId);
+	int SchemaId,
+	int ParentId);
 
