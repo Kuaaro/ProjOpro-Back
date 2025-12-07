@@ -19,7 +19,8 @@ internal sealed class DatasetService(IDatasetRepository datasetRepository) : IDa
                 Description = request.Description,
                 ContactPoint = request.ContactPoint,
                 Keywords = request.Keywords?.ToList() ?? new List<string>(),
-                Distribution = new List<Distribution>()
+                Distribution = new List<Distribution>(),
+                ParentId = request.ParentId
             };
 
             datasetRepository.Add(dataset);
