@@ -2,6 +2,7 @@
 using Application.Datasets.Models.CreateDataset;
 using Application.Datasets.Models.GetDataset;
 using Application.Datasets.Models.ModifyDataset;
+using Application.Datasets.Models.SetSchema;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers;
@@ -33,6 +34,16 @@ public sealed class DatasetController(IDatasetService datasetService) : Controll
 		[FromBody] ModifyDatasetRequest body)
 	{
 		return NoContent();
+	}
+
+	[HttpPut("{id}/schema")]
+	[ProducesResponseType<SetSchemaResponse>(200)]
+	public async Task<IActionResult> SetSchema(
+		int id,
+		[FromBody] SetSchemaRequest body)
+	{
+		var response = await datasetService.SetSchema(id, body);
+		return Ok(response);
 	}
 }
 

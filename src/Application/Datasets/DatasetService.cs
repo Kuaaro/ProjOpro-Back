@@ -1,11 +1,12 @@
 ﻿using Application.Datasets.Models.CreateDataset;
 using Application.Datasets.Models.GetDataset;
+using Application.Datasets.Models.SetSchema;
 using Domain.Entities;
 using Domain.Repositories;
 
 namespace Application.Datasets;
 
-internal sealed class DatasetService(IDatasetRepository datasetRepository) : IDatasetService
+internal sealed class DatasetService(IDatasetRepository datasetRepository, ISchemaRepository schemaRepository) : IDatasetService
 {
     public async Task<CreateDatasetResponse> CreateDataset(CreateDatasetRequest request)
     {
@@ -20,7 +21,8 @@ internal sealed class DatasetService(IDatasetRepository datasetRepository) : IDa
                 ContactPoint = request.ContactPoint,
                 Keywords = request.Keywords?.ToList() ?? new List<string>(),
                 Distribution = new List<Distribution>(),
-                ParentId = request.ParentId
+                ParentId = request.ParentId,
+                SchemaId = request.SchemaId
             };
 
             datasetRepository.Add(dataset);
@@ -31,6 +33,7 @@ internal sealed class DatasetService(IDatasetRepository datasetRepository) : IDa
             dataset.Description = request.Description;
             dataset.ContactPoint = request.ContactPoint;
             dataset.Keywords = request.Keywords?.ToList() ?? new List<string>();
+            dataset.SchemaId = request.SchemaId;
         }
 
         if (request.Distributions is not null)
@@ -75,9 +78,21 @@ internal sealed class DatasetService(IDatasetRepository datasetRepository) : IDa
             dataset.ContactPoint,
             dataset.Keywords.ToList(),
             distributionDtos,
-            dataset.ParentId
+            dataset.SchemaId
         );
 
+    }
+
+    public async Task<SetSchemaResponse> SetSchema(int datasetId, SetSchemaRequest request)
+    {
+        var dataset = await datasetRepository.GetById(datasetId);
+
+        var schema = await schemaRepository.GetById(request.SchemaId);
+
+        dataset.SchemaId = request.SchemaId;
+        await datasetRepository.SaveChanges();
+
+        return new SetSchemaResponse(datasetId, request.SchemaId);
     }
 
 }
