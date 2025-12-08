@@ -20,7 +20,7 @@ services:
       context: ./ProjOprog-Front/proj_oprog_front
       dockerfile: docker/Dockerfile
       args:
-        API_BASE_URL: ""
+        METADATA_MANAGER_API: "/api"
     container_name: projopro-frontend
     ports:
       - "80:80"

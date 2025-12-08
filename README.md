@@ -58,25 +58,23 @@ Run both backend and frontend together using Docker Compose.
 
 ### Setup
 
-1. Clone both repositories on the same level:
+1. Clone both repos:
+
 ```bash
-# Example structure:
-/parent-directory/
-├── ProjOpro-Back/      # Backend repository
-└── ProjOpro-Front/     # Frontend repository
+git clone https://github.com/Kuaaro/ProjOpro-Back.git
+git clone https://github.com/Kuaaro/ProjOprog-Front.git
 ```
 
 2. Move `docker-compose.yml` from the backend repository to the parent directory (same level as both repos):
 ```bash
-# From the parent directory:
-mv ProjOpro-Back/docker-compose.yml ./docker-compose.yml
+mv ProjOpro-Back/src/docker-compose.yml .
 ```
 
 Your final structure should look like:
 ```
 /parent-directory/
 ├── ProjOpro-Back/      # Backend repository
-├── ProjOpro-Front/     # Frontend repository
+├── ProjOprog-Front/     # Frontend repository
 └── docker-compose.yml  # Docker Compose file (moved here)
 ```
 
