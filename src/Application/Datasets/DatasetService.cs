@@ -1,6 +1,6 @@
 ﻿using Application.Datasets.Models.CreateDataset;
 using Application.Datasets.Models.GetDataset;
-using Application.Datasets.Models.SetSchema;
+using Application.Datasets.Models.ModifyDataset;
 using Domain.Entities;
 using Domain.Repositories;
 
@@ -83,16 +83,37 @@ internal sealed class DatasetService(IDatasetRepository datasetRepository, ISche
 
     }
 
-    public async Task<SetSchemaResponse> SetSchema(int datasetId, SetSchemaRequest request)
+    public async Task ModifyDataset(int id, ModifyDatasetRequest request)
     {
-        var dataset = await datasetRepository.GetById(datasetId);
+        var dataset = await datasetRepository.GetById(id);
 
         var schema = await schemaRepository.GetById(request.SchemaId);
 
+        dataset.Name = request.Name;
+        dataset.Description = request.Description;
+        dataset.ContactPoint = request.ContactPoint;
+        dataset.Keywords = request.Keywords?.ToList() ?? new List<string>();
         dataset.SchemaId = request.SchemaId;
-        await datasetRepository.SaveChanges();
 
-        return new SetSchemaResponse(datasetId, request.SchemaId);
+        dataset.Distribution.Clear();
+        if (request.Distributions is not null)
+        {
+            foreach (var d in request.Distributions)
+            {
+                var distribution = new Distribution
+                {
+                    AccessUrl = d.AccessUrl,
+                    Description = d.Description,
+                    Format = d.Format,
+                    IsAvailable = d.Availability,
+                    DataSet = dataset
+                };
+
+                dataset.Distribution.Add(distribution);
+            }
+        }
+
+        await datasetRepository.SaveChanges();
     }
 
 }
