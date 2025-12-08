@@ -86,8 +86,18 @@ internal sealed class DatasetService(IDatasetRepository datasetRepository, ISche
     public async Task ModifyDataset(int id, ModifyDatasetRequest request)
     {
         var dataset = await datasetRepository.GetById(id);
+        
+        if (dataset is null)
+        {
+            throw new InvalidOperationException($"Dataset with id {id} not found.");
+        }
 
         var schema = await schemaRepository.GetById(request.SchemaId);
+        
+        if (schema is null)
+        {
+            throw new InvalidOperationException($"Schema with id {request.SchemaId} not found.");
+        }
 
         dataset.Name = request.Name;
         dataset.Description = request.Description;

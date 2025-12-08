@@ -32,8 +32,8 @@ public sealed class DatasetController(IDatasetService datasetService) : Controll
 		int id,
 		[FromBody] ModifyDatasetRequest body)
 	{
-		var response = await datasetService.ModifyDataset(id, body);
-		return Ok(response);
+		await datasetService.ModifyDataset(id, body);
+		return Ok();
 	}
 }
 
