@@ -1,4 +1,3 @@
-using Application.Catalogs;
 using Application.Schemas;
 using Application.Schemas.Models.CreateSchema;
 using Application.Schemas.Models.GetSchema;
@@ -41,6 +40,7 @@ public sealed class SchemaController(ISchemaService schemaService) : ControllerB
 		int id,
 		[FromBody] ModifySchemaRequest body)
 	{
+		await schemaService.ModifySchema(id, body);
 		return NoContent();
 	}
 }
