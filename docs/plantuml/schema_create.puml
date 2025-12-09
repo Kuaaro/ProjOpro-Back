@@ -1,0 +1,76 @@
+@startuml Schema_CreateSchema_Endpoint
+
+' Endpoint: POST /schemas
+' Controller: SchemaController
+' Method: CreateSchema
+
+skinparam classAttributeIconSize 0
+skinparam class {
+    BackgroundColor<<Controller>> LightBlue
+    BackgroundColor<<Service>> LightGreen
+    BackgroundColor<<Repository>> LightYellow
+    BackgroundColor<<Entity>> LightCoral
+    BackgroundColor<<DTO>> LightGray
+}
+
+class SchemaController <<Controller>> {
+    + CreateSchema(body: CreateSchemaRequest): CreateSchemaResponse
+}
+
+interface ISchemaService <<Service>> {
+    + CreateSchema(request: CreateSchemaRequest): CreateSchemaResponse
+}
+
+class SchemaService <<Service>> {
+    + CreateSchema(request: CreateSchemaRequest): CreateSchemaResponse
+}
+
+class CreateSchemaRequest <<DTO>> {
+    + Name: string
+    + JsonSchema: string
+}
+
+class CreateSchemaResponse <<DTO>> {
+    + Id: int
+}
+
+interface ISchemaRepository <<Repository>> {
+    + Add(schema: Schema): void
+    + GetAll(): List<Schema>
+    + GetById(id: int): Schema?
+    + SaveChanges(): void
+}
+
+class SchemaRepository <<Repository>> {
+    + Add(schema: Schema): void
+    + GetAll(): List<Schema>
+    + GetById(id: int): Schema?
+    + SaveChanges(): void
+}
+
+class Schema <<Entity>> {
+    + Id: int
+    + Name: string
+    + JsonSchema: string
+    + DataSets: List<DataSet>
+}
+
+' Relationships
+SchemaController ..> ISchemaService : uses
+SchemaController ..> CreateSchemaRequest : receives
+SchemaController ..> CreateSchemaResponse : returns
+ISchemaService <|.. SchemaService : implements
+SchemaService ..> ISchemaRepository : uses
+SchemaService ..> CreateSchemaRequest : uses
+SchemaService ..> CreateSchemaResponse : creates
+SchemaService ..> Schema : creates
+ISchemaRepository <|.. SchemaRepository : implements
+SchemaRepository ..> Schema : persists
+
+note right of SchemaController
+  **HTTP POST** /schemas
+  Creates a new schema
+  Status: 201 Created
+end note
+
+@enduml

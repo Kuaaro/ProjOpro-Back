@@ -1,0 +1,74 @@
+@startuml Schema_GetSchemaList_Endpoint
+
+' Endpoint: GET /schemas/list
+' Controller: SchemaController
+' Method: GetSchemaList
+
+skinparam classAttributeIconSize 0
+skinparam class {
+    BackgroundColor<<Controller>> LightBlue
+    BackgroundColor<<Service>> LightGreen
+    BackgroundColor<<Repository>> LightYellow
+    BackgroundColor<<Entity>> LightCoral
+    BackgroundColor<<DTO>> LightGray
+}
+
+class SchemaController <<Controller>> {
+    + GetSchemaList(): GetSchemaListResponse
+}
+
+interface ISchemaService <<Service>> {
+    + GetSchemaListAsync(): GetSchemaListResponse
+}
+
+class SchemaService <<Service>> {
+    + GetSchemaListAsync(): GetSchemaListResponse
+}
+
+class GetSchemaListResponse <<DTO>> {
+    + Schemas: List<NameIdPair>
+}
+
+class NameIdPair <<DTO>> {
+    + Name: string
+    + Id: int
+}
+
+interface ISchemaRepository <<Repository>> {
+    + Add(schema: Schema): void
+    + GetAll(): List<Schema>
+    + GetById(id: int): Schema?
+    + SaveChanges(): void
+}
+
+class SchemaRepository <<Repository>> {
+    + Add(schema: Schema): void
+    + GetAll(): List<Schema>
+    + GetById(id: int): Schema?
+    + SaveChanges(): void
+}
+
+class Schema <<Entity>> {
+    + Id: int
+    + Name: string
+    + JsonSchema: string
+    + DataSets: List<DataSet>
+}
+
+' Relationships
+SchemaController ..> ISchemaService : uses
+SchemaController ..> GetSchemaListResponse : returns
+ISchemaService <|.. SchemaService : implements
+SchemaService ..> ISchemaRepository : uses
+SchemaService ..> GetSchemaListResponse : creates
+GetSchemaListResponse *-- NameIdPair : contains
+ISchemaRepository <|.. SchemaRepository : implements
+SchemaRepository ..> Schema : persists
+
+note right of SchemaController
+  **HTTP GET** /schemas/list
+  Returns all schemas as name-id pairs
+  Status: 200 OK
+end note
+
+@enduml

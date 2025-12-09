@@ -1,0 +1,109 @@
+@startuml Catalog_GetCatalogChildren_Endpoint
+
+' Endpoint: GET /catalogs/children/{id}
+' Controller: CatalogController
+' Method: GetCatalogChildren
+
+skinparam classAttributeIconSize 0
+skinparam class {
+    BackgroundColor<<Controller>> LightBlue
+    BackgroundColor<<Service>> LightGreen
+    BackgroundColor<<Repository>> LightYellow
+    BackgroundColor<<Entity>> LightCoral
+    BackgroundColor<<DTO>> LightGray
+}
+
+class CatalogController <<Controller>> {
+    + GetCatalogChildren(id: int): GetCatalogChildrenResponse
+}
+
+interface ICatalogService <<Service>> {
+    + GetCatalogChildren(id: int): GetCatalogChildrenResponse
+}
+
+class CatalogService <<Service>> {
+    + GetCatalogChildren(parentId: int): GetCatalogChildrenResponse
+}
+
+class GetCatalogChildrenResponse <<DTO>> {
+    + Catalogs: List<NameIdPair>
+    + Datasets: List<NameIdPair>
+}
+
+class NameIdPair <<DTO>> {
+    + Name: string
+    + Id: int
+}
+
+interface ICatalogRepository <<Repository>> {
+    + GetByParentId(parentId: int): IReadOnlyList<Catalog>
+    + GetById(id: int): Catalog?
+    + Add(catalog: Catalog): void
+    + SaveChanges(): void
+}
+
+class CatalogRepository <<Repository>> {
+    + GetByParentId(parentId: int): IReadOnlyList<Catalog>
+    + GetById(id: int): Catalog?
+    + Add(catalog: Catalog): void
+    + SaveChanges(): void
+}
+
+interface IDatasetRepository <<Repository>> {
+    + GetByParentId(parentId: int): IReadOnlyList<DataSet>
+    + GetById(id: int): DataSet?
+    + GetByName(name: string): DataSet?
+    + Add(dataset: DataSet): void
+    + SaveChanges(): void
+}
+
+class DatasetRepository <<Repository>> {
+    + GetByParentId(parentId: int): IReadOnlyList<DataSet>
+    + GetById(id: int): DataSet?
+    + GetByName(name: string): DataSet?
+    + Add(dataset: DataSet): void
+    + SaveChanges(): void
+}
+
+class Catalog <<Entity>> {
+    + Id: int
+    + Name: string
+    + Description: string
+    + ParentId: int
+    + Parent: Catalog?
+    + Children: List<Catalog>
+    + DataSets: List<DataSet>
+}
+
+class DataSet <<Entity>> {
+    + Id: int
+    + Name: string
+    + Description: string?
+    + ContactPoint: string?
+    + SchemaId: int
+    + Schema: Schema?
+    + Distribution: List<Distribution>
+    + Keywords: List<string>
+    + ParentId: int
+}
+
+' Relationships
+CatalogController ..> ICatalogService : uses
+CatalogController ..> GetCatalogChildrenResponse : returns
+ICatalogService <|.. CatalogService : implements
+CatalogService ..> ICatalogRepository : uses
+CatalogService ..> IDatasetRepository : uses
+CatalogService ..> GetCatalogChildrenResponse : creates
+GetCatalogChildrenResponse *-- NameIdPair : contains
+ICatalogRepository <|.. CatalogRepository : implements
+IDatasetRepository <|.. DatasetRepository : implements
+CatalogRepository ..> Catalog : persists
+DatasetRepository ..> DataSet : persists
+
+note right of CatalogController
+  **HTTP GET** /catalogs/children/{id}
+  Returns child catalogs and datasets
+  Status: 200 OK
+end note
+
+@enduml
