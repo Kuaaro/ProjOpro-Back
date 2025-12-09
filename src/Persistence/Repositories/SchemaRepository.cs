@@ -19,5 +19,11 @@ internal sealed class SchemaRepository(ApplicationDbContext dbContext)
         return await dbContext.Schemas
             .ToListAsync();
     }
+
+    public Task<Schema?> GetById(int id)
+    {
+        return dbContext.Schemas
+            .FirstOrDefaultAsync(s => s.Id == id);
+    }
 }
 

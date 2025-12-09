@@ -1,11 +1,12 @@
 ﻿using Application.Datasets.Models.CreateDataset;
 using Application.Datasets.Models.GetDataset;
+using Application.Datasets.Models.ModifyDataset;
 using Domain.Entities;
 using Domain.Repositories;
 
 namespace Application.Datasets;
 
-internal sealed class DatasetService(IDatasetRepository datasetRepository) : IDatasetService
+internal sealed class DatasetService(IDatasetRepository datasetRepository, ISchemaRepository schemaRepository) : IDatasetService
 {
     public async Task<CreateDatasetResponse> CreateDataset(CreateDatasetRequest request)
     {
@@ -20,7 +21,8 @@ internal sealed class DatasetService(IDatasetRepository datasetRepository) : IDa
                 ContactPoint = request.ContactPoint,
                 Keywords = request.Keywords?.ToList() ?? new List<string>(),
                 Distribution = new List<Distribution>(),
-                ParentId = request.ParentId
+                ParentId = request.ParentId,
+                SchemaId = request.SchemaId
             };
 
             datasetRepository.Add(dataset);
@@ -31,6 +33,7 @@ internal sealed class DatasetService(IDatasetRepository datasetRepository) : IDa
             dataset.Description = request.Description;
             dataset.ContactPoint = request.ContactPoint;
             dataset.Keywords = request.Keywords?.ToList() ?? new List<string>();
+            dataset.SchemaId = request.SchemaId;
         }
 
         if (request.Distributions is not null)
@@ -75,9 +78,52 @@ internal sealed class DatasetService(IDatasetRepository datasetRepository) : IDa
             dataset.ContactPoint,
             dataset.Keywords.ToList(),
             distributionDtos,
-            dataset.ParentId
+            dataset.SchemaId
         );
 
+    }
+
+    public async Task ModifyDataset(int id, ModifyDatasetRequest request)
+    {
+        var dataset = await datasetRepository.GetById(id);
+        
+        if (dataset is null)
+        {
+            throw new InvalidOperationException($"Dataset with id {id} not found.");
+        }
+
+        var schema = await schemaRepository.GetById(request.SchemaId);
+        
+        if (schema is null)
+        {
+            throw new InvalidOperationException($"Schema with id {request.SchemaId} not found.");
+        }
+
+        dataset.Name = request.Name;
+        dataset.Description = request.Description;
+        dataset.ContactPoint = request.ContactPoint;
+        dataset.Keywords = request.Keywords?.ToList() ?? new List<string>();
+        dataset.SchemaId = request.SchemaId;
+
+        dataset.Distribution.Clear();
+        if (request.Distributions is not null)
+        {
+            foreach (var d in request.Distributions)
+            {
+                var distribution = new Distribution
+                {
+                    AccessUrl = d.AccessUrl,
+                    Description = d.Description,
+                    Format = d.Format,
+                    IsAvailable = d.Availability,
+                    DataSet = dataset
+                };
+
+                dataset.Distribution.Add(distribution);
+            }
+        }
+
+        await datasetRepository.SaveChanges();
     }
 
 }
