@@ -1,0 +1,67 @@
+@startuml Schema_ModifySchema_Endpoint
+
+' Endpoint: PUT /schemas/{id}
+' Controller: SchemaController
+' Method: ModifySchema
+' NOTE: This endpoint is NOT IMPLEMENTED - returns NoContent() without processing
+
+skinparam classAttributeIconSize 0
+skinparam class {
+    BackgroundColor<<Controller>> LightBlue
+    BackgroundColor<<Service>> LightGreen
+    BackgroundColor<<Repository>> LightYellow
+    BackgroundColor<<Entity>> LightCoral
+    BackgroundColor<<DTO>> LightGray
+    BackgroundColor<<NotImplemented>> #FFE6E6
+}
+
+class SchemaController <<Controller>> <<NotImplemented>> {
+    + ModifySchema(id: int, body: ModifySchemaRequest): void
+}
+
+class ModifySchemaRequest <<DTO>> {
+    + Name: string
+    + JsonSchema: string
+}
+
+interface ISchemaRepository <<Repository>> {
+    + Add(schema: Schema): void
+    + GetAll(): List<Schema>
+    + GetById(id: int): Schema?
+    + SaveChanges(): void
+}
+
+class SchemaRepository <<Repository>> {
+    + Add(schema: Schema): void
+    + GetAll(): List<Schema>
+    + GetById(id: int): Schema?
+    + SaveChanges(): void
+}
+
+class Schema <<Entity>> {
+    + Id: int
+    + Name: string
+    + JsonSchema: string
+    + DataSets: List<DataSet>
+}
+
+' Relationships (dashed to indicate not implemented)
+SchemaController ..> ModifySchemaRequest : receives
+ISchemaRepository <|.. SchemaRepository : implements
+SchemaRepository ..> Schema : persists
+
+note right of SchemaController
+  **HTTP PUT** /schemas/{id}
+  ⚠️ NOT IMPLEMENTED
+  Currently returns NoContent() 
+  without processing request
+  Should update schema by ID
+  Status: 204 No Content
+end note
+
+note left of ModifySchemaRequest
+  Request DTO defined
+  but not currently used
+end note
+
+@enduml

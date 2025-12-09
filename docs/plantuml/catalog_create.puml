@@ -1,0 +1,80 @@
+@startuml Catalog_CreateCatalog_Endpoint
+
+' Endpoint: POST /catalogs
+' Controller: CatalogController
+' Method: CreateCatalog
+
+skinparam classAttributeIconSize 0
+skinparam class {
+    BackgroundColor<<Controller>> LightBlue
+    BackgroundColor<<Service>> LightGreen
+    BackgroundColor<<Repository>> LightYellow
+    BackgroundColor<<Entity>> LightCoral
+    BackgroundColor<<DTO>> LightGray
+}
+
+class CatalogController <<Controller>> {
+    + CreateCatalog(body: CreateCatalogRequest): CreateCatalogResponse
+}
+
+interface ICatalogService <<Service>> {
+    + CreateCatalog(request: CreateCatalogRequest): CreateCatalogResponse
+}
+
+class CatalogService <<Service>> {
+    + CreateCatalog(request: CreateCatalogRequest): CreateCatalogResponse
+}
+
+class CreateCatalogRequest <<DTO>> {
+    + Name: string
+    + Description: string
+    + ParentCatalogId: int
+}
+
+class CreateCatalogResponse <<DTO>> {
+    + Id: int
+}
+
+interface ICatalogRepository <<Repository>> {
+    + GetByParentId(parentId: int): IReadOnlyList<Catalog>
+    + GetById(id: int): Catalog?
+    + Add(catalog: Catalog): void
+    + SaveChanges(): void
+}
+
+class CatalogRepository <<Repository>> {
+    + GetByParentId(parentId: int): IReadOnlyList<Catalog>
+    + GetById(id: int): Catalog?
+    + Add(catalog: Catalog): void
+    + SaveChanges(): void
+}
+
+class Catalog <<Entity>> {
+    + Id: int
+    + Name: string
+    + Description: string
+    + ParentId: int
+    + Parent: Catalog?
+    + Children: List<Catalog>
+    + DataSets: List<DataSet>
+}
+
+' Relationships
+CatalogController ..> ICatalogService : uses
+CatalogController ..> CreateCatalogRequest : receives
+CatalogController ..> CreateCatalogResponse : returns
+ICatalogService <|.. CatalogService : implements
+CatalogService ..> ICatalogRepository : uses
+CatalogService ..> CreateCatalogRequest : uses
+CatalogService ..> CreateCatalogResponse : creates
+CatalogService ..> Catalog : creates
+ICatalogRepository <|.. CatalogRepository : implements
+CatalogRepository ..> Catalog : persists
+
+note right of CatalogController
+  **HTTP POST** /catalogs
+  Creates a new catalog
+  Status: 201 Created
+end note
+
+@enduml

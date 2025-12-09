@@ -1,0 +1,133 @@
+@startuml Dataset_CreateDataset_Endpoint
+
+' Endpoint: POST /datasets
+' Controller: DatasetController
+' Method: CreateDataset
+
+skinparam classAttributeIconSize 0
+skinparam class {
+    BackgroundColor<<Controller>> LightBlue
+    BackgroundColor<<Service>> LightGreen
+    BackgroundColor<<Repository>> LightYellow
+    BackgroundColor<<Entity>> LightCoral
+    BackgroundColor<<DTO>> LightGray
+}
+
+class DatasetController <<Controller>> {
+    + CreateDataset(body: CreateDatasetRequest): CreateDatasetResponse
+}
+
+interface IDatasetService <<Service>> {
+    + CreateDataset(request: CreateDatasetRequest): CreateDatasetResponse
+}
+
+class DatasetService <<Service>> {
+    + CreateDataset(request: CreateDatasetRequest): CreateDatasetResponse
+}
+
+class CreateDatasetRequest <<DTO>> {
+    + Name: string
+    + Description: string
+    + ContactPoint: string
+    + Keywords: List<string>
+    + Distributions: List<DistributionFull>
+    + SchemaId: int
+    + ParentId: int
+}
+
+class CreateDatasetResponse <<DTO>> {
+    + Id: int
+}
+
+class DistributionFull <<DTO>> {
+    + DistributionId: int
+    + AccessUrl: string
+    + Description: string
+    + Format: string
+    + Availability: bool
+}
+
+interface IDatasetRepository <<Repository>> {
+    + GetByParentId(parentId: int): IReadOnlyList<DataSet>
+    + GetById(id: int): DataSet?
+    + GetByName(name: string): DataSet?
+    + Add(dataset: DataSet): void
+    + SaveChanges(): void
+}
+
+class DatasetRepository <<Repository>> {
+    + GetByParentId(parentId: int): IReadOnlyList<DataSet>
+    + GetById(id: int): DataSet?
+    + GetByName(name: string): DataSet?
+    + Add(dataset: DataSet): void
+    + SaveChanges(): void
+}
+
+interface ISchemaRepository <<Repository>> {
+    + Add(schema: Schema): void
+    + GetAll(): List<Schema>
+    + GetById(id: int): Schema?
+    + SaveChanges(): void
+}
+
+class SchemaRepository <<Repository>> {
+    + Add(schema: Schema): void
+    + GetAll(): List<Schema>
+    + GetById(id: int): Schema?
+    + SaveChanges(): void
+}
+
+class DataSet <<Entity>> {
+    + Id: int
+    + Name: string
+    + Description: string?
+    + ContactPoint: string?
+    + SchemaId: int
+    + Schema: Schema?
+    + Distribution: List<Distribution>
+    + Keywords: List<string>
+    + ParentId: int
+}
+
+class Distribution <<Entity>> {
+    + Id: int
+    + AccessUrl: string?
+    + Description: string?
+    + IsAvailable: bool
+    + Format: string?
+    + DataSet: DataSet?
+}
+
+class Schema <<Entity>> {
+    + Id: int
+    + Name: string
+    + JsonSchema: string
+    + DataSets: List<DataSet>
+}
+
+' Relationships
+DatasetController ..> IDatasetService : uses
+DatasetController ..> CreateDatasetRequest : receives
+DatasetController ..> CreateDatasetResponse : returns
+IDatasetService <|.. DatasetService : implements
+DatasetService ..> IDatasetRepository : uses
+DatasetService ..> ISchemaRepository : uses
+DatasetService ..> CreateDatasetRequest : uses
+DatasetService ..> CreateDatasetResponse : creates
+DatasetService ..> DataSet : creates
+DatasetService ..> Distribution : creates
+CreateDatasetRequest *-- DistributionFull : contains
+IDatasetRepository <|.. DatasetRepository : implements
+DatasetRepository ..> DataSet : persists
+ISchemaRepository <|.. SchemaRepository : implements
+SchemaRepository ..> Schema : persists
+DataSet "1" *-- "*" Distribution : has
+DataSet "*" --> "1" Schema : references
+
+note right of DatasetController
+  **HTTP POST** /datasets
+  Creates a new dataset with distributions
+  Status: 200 OK (should be 201)
+end note
+
+@enduml

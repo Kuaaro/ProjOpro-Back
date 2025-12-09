@@ -1,0 +1,66 @@
+@startuml Schema_GetSchema_Endpoint
+
+' Endpoint: GET /schemas/{id}
+' Controller: SchemaController
+' Method: GetSchema
+' NOTE: This endpoint is NOT IMPLEMENTED - returns Ok() with no data
+
+skinparam classAttributeIconSize 0
+skinparam class {
+    BackgroundColor<<Controller>> LightBlue
+    BackgroundColor<<Service>> LightGreen
+    BackgroundColor<<Repository>> LightYellow
+    BackgroundColor<<Entity>> LightCoral
+    BackgroundColor<<DTO>> LightGray
+    BackgroundColor<<NotImplemented>> #FFE6E6
+}
+
+class SchemaController <<Controller>> <<NotImplemented>> {
+    + GetSchema(id: int): GetSchemaResponse
+}
+
+class GetSchemaResponse <<DTO>> {
+    + Name: string
+    + JsonSchema: string
+}
+
+interface ISchemaRepository <<Repository>> {
+    + Add(schema: Schema): void
+    + GetAll(): List<Schema>
+    + GetById(id: int): Schema?
+    + SaveChanges(): void
+}
+
+class SchemaRepository <<Repository>> {
+    + Add(schema: Schema): void
+    + GetAll(): List<Schema>
+    + GetById(id: int): Schema?
+    + SaveChanges(): void
+}
+
+class Schema <<Entity>> {
+    + Id: int
+    + Name: string
+    + JsonSchema: string
+    + DataSets: List<DataSet>
+}
+
+' Relationships (dashed to indicate not implemented)
+SchemaController ..> GetSchemaResponse : should return
+ISchemaRepository <|.. SchemaRepository : implements
+SchemaRepository ..> Schema : persists
+
+note right of SchemaController
+  **HTTP GET** /schemas/{id}
+  ⚠️ NOT IMPLEMENTED
+  Currently returns Ok() with no data
+  Should return schema details by ID
+  Status: 200 OK
+end note
+
+note left of GetSchemaResponse
+  Expected response DTO
+  (not currently used)
+end note
+
+@enduml
