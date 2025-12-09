@@ -23,7 +23,8 @@ public sealed class SchemaController(ISchemaService schemaService) : ControllerB
 	[ProducesResponseType<GetSchemaResponse>(200)]
 	public async Task<IActionResult> GetSchema(int id)
 	{
-		return Ok();
+		var response = await schemaService.GetSchema(id);
+		return Ok(response);
 	}
 
 	[HttpPost]

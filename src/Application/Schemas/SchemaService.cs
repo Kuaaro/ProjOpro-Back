@@ -1,4 +1,5 @@
 ﻿using Application.Schemas.Models.CreateSchema;
+using Application.Schemas.Models.GetSchema;
 using Application.Schemas.Models.GetSchemaList;
 using Application.Schemas.Models.ModifySchema;
 using Domain.Entities;
@@ -24,6 +25,14 @@ internal sealed class SchemaService(ISchemaRepository schemaRepository) : ISchem
         schema.Name = body.Name;
         schema.JsonSchema = body.JsonSchema;
         await schemaRepository.SaveChanges();
+    }
+
+    public async Task<GetSchemaResponse> GetSchema(int id)
+    {
+        var schema = await schemaRepository.GetById(id);
+        if (schema is null)
+            throw new InvalidOperationException($"Schema with id {id} not found.");
+        return new GetSchemaResponse(schema.Name, schema.JsonSchema);
     }
 
     public async Task<GetSchemaListResponse> GetSchemaListAsync()

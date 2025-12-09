@@ -28,6 +28,7 @@ public sealed class DatasetController(IDatasetService datasetService) : Controll
     }
 
 	[HttpPut("{id}")]
+	[ProducesResponseType(204)]
 	public async Task<IActionResult> ModifyDataset(
 		int id,
 		[FromBody] ModifyDatasetRequest body)
