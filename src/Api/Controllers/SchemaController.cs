@@ -1,4 +1,3 @@
-using Application.Catalogs;
 using Application.Schemas;
 using Application.Schemas.Models.CreateSchema;
 using Application.Schemas.Models.GetSchema;
@@ -24,7 +23,8 @@ public sealed class SchemaController(ISchemaService schemaService) : ControllerB
 	[ProducesResponseType<GetSchemaResponse>(200)]
 	public async Task<IActionResult> GetSchema(int id)
 	{
-		return Ok();
+		var response = await schemaService.GetSchema(id);
+		return Ok(response);
 	}
 
 	[HttpPost]
@@ -41,6 +41,7 @@ public sealed class SchemaController(ISchemaService schemaService) : ControllerB
 		int id,
 		[FromBody] ModifySchemaRequest body)
 	{
+		await schemaService.ModifySchema(id, body);
 		return NoContent();
 	}
 }
