@@ -92,11 +92,14 @@ internal sealed class DatasetService(IDatasetRepository datasetRepository, ISche
             throw new InvalidOperationException($"Dataset with id {id} not found.");
         }
 
-        var schema = await schemaRepository.GetById(request.SchemaId);
-        
-        if (schema is null)
+        if (request.SchemaId != 0)
         {
-            throw new InvalidOperationException($"Schema with id {request.SchemaId} not found.");
+            var schema = await schemaRepository.GetById(request.SchemaId);
+            
+            if (schema is null)
+            {
+                throw new InvalidOperationException($"Schema with id {request.SchemaId} not found.");
+            }
         }
 
         dataset.Name = request.Name;
