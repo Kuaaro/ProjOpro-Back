@@ -13,6 +13,10 @@ internal sealed class ApplicationDbContext(DbContextOptions options) : DbContext
 
 	public DbSet<Schema> Schemas { get; set; }
 
+	public DbSet<SensorRouter> SensorRouters { get; set; }
+
+	public DbSet<DataEntry> DataEntries { get; set; }
+
 	protected override void OnModelCreating(ModelBuilder modelBuilder)
 	{
 		modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
