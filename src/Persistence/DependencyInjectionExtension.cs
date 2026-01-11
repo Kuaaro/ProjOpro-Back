@@ -20,6 +20,8 @@ public static class DependencyInjectionExtension
 		services.AddScoped<ICatalogRepository, CatalogRepository>();
 		services.AddScoped<IDatasetRepository, DatasetRepository>();
 		services.AddScoped<ISchemaRepository, SchemaRepository>();
+		services.AddScoped<ISensorRouterRepository, SensorRouterRepository>();
+		services.AddScoped<IDataEntryRepository, DataEntryRepository>();
 		return services;
 	}
 }
