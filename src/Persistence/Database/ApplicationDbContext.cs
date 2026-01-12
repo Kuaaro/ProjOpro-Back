@@ -17,7 +17,10 @@ internal sealed class ApplicationDbContext(DbContextOptions options) : DbContext
 
 	public DbSet<DataEntry> DataEntries { get; set; }
 
-	protected override void OnModelCreating(ModelBuilder modelBuilder)
+    public DbSet<UserFeedback> UserFeedbacks { get; set; }
+
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
 	{
 		modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
 		base.OnModelCreating(modelBuilder);

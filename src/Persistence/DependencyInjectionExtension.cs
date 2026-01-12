@@ -22,6 +22,7 @@ public static class DependencyInjectionExtension
 		services.AddScoped<ISchemaRepository, SchemaRepository>();
 		services.AddScoped<ISensorRouterRepository, SensorRouterRepository>();
 		services.AddScoped<IDataEntryRepository, DataEntryRepository>();
-		return services;
+		services.AddScoped<IUserFeedbackRepository, UserFeedbackRepository>();
+        return services;
 	}
 }
