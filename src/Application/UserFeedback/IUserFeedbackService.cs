@@ -8,4 +8,6 @@ public interface IUserFeedbackService
 {
     Task<CreateUserFeedbackResponse> CreateFeedback(CreateUserFeedbackRequest request);
     Task<GetUserFeedbackDetails> GetUserFeedback(int id);
+    Task<GetUserFeedbackList> GetUserFeedbackList(int datasetId);
+    Task DeleteUserFeedback(int userFeedbackId);
 }

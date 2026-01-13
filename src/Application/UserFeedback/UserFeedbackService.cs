@@ -36,4 +36,28 @@ internal sealed class UserFeedbackService(IUserFeedbackRepository userFeedbackRe
             DatasetId = feedback.DatasetId
         };
     }
+    public async Task<GetUserFeedbackList> GetUserFeedbackList(int datasetId)
+    {
+        var feedbacks = await userFeedbackRepository.GetByDatasetId(datasetId);
+
+        return new GetUserFeedbackList
+        {
+            NameIdPairs = feedbacks.Select(f => new NameIdPair
+            {
+                Id = f.UserFeedbackId,
+                Name = f.ContactPoint
+            }).ToList()
+        };
+    }
+
+    public async Task DeleteUserFeedback(int userFeedbackId)
+    {
+        var feedback = await userFeedbackRepository.GetById(userFeedbackId);
+
+        if (feedback is null)
+            return;
+
+        userFeedbackRepository.Delete(feedback);
+        await userFeedbackRepository.SaveChanges();
+    }
 }
