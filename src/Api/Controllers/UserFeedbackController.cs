@@ -29,4 +29,22 @@ public sealed class UserFeedbackController(IUserFeedbackService userFeedbackServ
 
         return Ok(response);
     }
+
+    [HttpGet("userfeedback/list/{datasetId:int}")]
+    [ProducesResponseType<GetUserFeedbackList>(200)]
+    public async Task<IActionResult> GetUserFeedbackList(
+        [FromRoute] int datasetId)
+    {
+        var response = await userFeedbackService.GetUserFeedbackList(datasetId);
+        return Ok(response);
+    }
+
+    [HttpDelete("userfeedback/{userFeedbackId:int}")]
+    [ProducesResponseType(204)]
+    public async Task<IActionResult> DeleteUserFeedback(
+        [FromRoute] int userFeedbackId)
+    {
+        await userFeedbackService.DeleteUserFeedback(userFeedbackId);
+        return NoContent();
+    }
 }

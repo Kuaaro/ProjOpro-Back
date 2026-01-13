@@ -16,6 +16,16 @@ internal sealed class UserFeedbackRepository(ApplicationDbContext dbContext) : I
             .FirstOrDefaultAsync(c => c.UserFeedbackId == id);
     }
 
+    public Task<List<UserFeedback>> GetByDatasetId(int datasetId)
+    {
+        return dbContext.UserFeedbacks
+            .Where(c => c.DatasetId == datasetId)
+            .ToListAsync();
+    }
+
+    public void Delete(UserFeedback userFeedback)
+        => dbContext.UserFeedbacks.Remove(userFeedback);
+
     public Task SaveChanges(CancellationToken cancellationToken)
         => dbContext.SaveChangesAsync(cancellationToken);
 }
