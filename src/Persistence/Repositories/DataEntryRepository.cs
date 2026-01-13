@@ -1,5 +1,6 @@
 using Domain.Entities;
 using Domain.Repositories;
+using Microsoft.EntityFrameworkCore;
 using Persistence.Database;
 
 namespace Persistence.Repositories;
@@ -15,4 +16,11 @@ internal sealed class DataEntryRepository(ApplicationDbContext dbContext) : IDat
 	{
 		return dbContext.SaveChangesAsync(cancellationToken);
 	}
+
+    public Task<List<DataEntry>> GetByDatasetId(int datasetId)
+    {
+        return dbContext.DataEntries
+            .Where(x => x.DatasetId == datasetId)
+            .ToListAsync();
+    }
 }

@@ -6,7 +6,7 @@ using Domain.Repositories;
 
 namespace Application.Datasets;
 
-internal sealed class DatasetService(IDatasetRepository datasetRepository, ISchemaRepository schemaRepository) : IDatasetService
+internal sealed class DatasetService(IDatasetRepository datasetRepository, ISchemaRepository schemaRepository, IDataEntryRepository dataEntryRepository) : IDatasetService
 {
     public async Task<CreateDatasetResponse> CreateDataset(CreateDatasetRequest request)
     {
@@ -64,11 +64,11 @@ internal sealed class DatasetService(IDatasetRepository datasetRepository, ISche
 
         var distributionDtos = dataset.Distribution
             .Select(d => new Models.GetDataset.DistributionFull(
-                d.Id,           
-                d.AccessUrl,             
-                d.Description,  
-                d.Format,   
-                d.IsAvailable  
+                d.Id,
+                d.AccessUrl,
+                d.Description,
+                d.Format,
+                d.IsAvailable
             ))
             .ToList();
 
@@ -86,7 +86,7 @@ internal sealed class DatasetService(IDatasetRepository datasetRepository, ISche
     public async Task ModifyDataset(int id, ModifyDatasetRequest request)
     {
         var dataset = await datasetRepository.GetById(id);
-        
+
         if (dataset is null)
         {
             throw new InvalidOperationException($"Dataset with id {id} not found.");
@@ -95,7 +95,7 @@ internal sealed class DatasetService(IDatasetRepository datasetRepository, ISche
         if (request.SchemaId != 0)
         {
             var schema = await schemaRepository.GetById(request.SchemaId);
-            
+
             if (schema is null)
             {
                 throw new InvalidOperationException($"Schema with id {request.SchemaId} not found.");
@@ -129,4 +129,8 @@ internal sealed class DatasetService(IDatasetRepository datasetRepository, ISche
         await datasetRepository.SaveChanges();
     }
 
+    public async Task<List<DataEntry>> GetDatasetData(int datasetId)
+    {
+        return await dataEntryRepository.GetByDatasetId(datasetId);
+    }
 }

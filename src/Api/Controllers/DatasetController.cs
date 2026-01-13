@@ -2,6 +2,7 @@
 using Application.Datasets.Models.CreateDataset;
 using Application.Datasets.Models.GetDataset;
 using Application.Datasets.Models.ModifyDataset;
+using Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers;
@@ -36,5 +37,13 @@ public sealed class DatasetController(IDatasetService datasetService) : Controll
 		await datasetService.ModifyDataset(id, body);
 		return Ok();
 	}
+
+    [HttpGet("data/{id}")]
+    [ProducesResponseType<List<DataEntry>>(200)]
+    public async Task<IActionResult> GetDatasetData(int id)
+    {
+        var data = await datasetService.GetDatasetData(id);
+        return Ok(data);
+    }
 }
 
