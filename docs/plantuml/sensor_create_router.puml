@@ -1,0 +1,73 @@
+@startuml Sensor_CreateSensorRouter_Endpoint
+
+' Endpoint: POST /data/sensor/sensorrouter
+' Controller: SensorController
+' Method: CreateSensorRouter
+
+skinparam classAttributeIconSize 0
+skinparam class {
+    BackgroundColor<<Controller>> LightBlue
+    BackgroundColor<<Service>> LightGreen
+    BackgroundColor<<Repository>> LightYellow
+    BackgroundColor<<Entity>> LightCoral
+    BackgroundColor<<DTO>> LightGray
+}
+
+class SensorController <<Controller>> {
+    + CreateSensorRouter(body: CreateSensorRouterRequest): CreateSensorRouterResponse
+}
+
+interface ISensorService <<Service>> {
+    + CreateSensorRouter(request: CreateSensorRouterRequest): CreateSensorRouterResponse
+}
+
+class SensorService <<Service>> {
+    + CreateSensorRouter(request: CreateSensorRouterRequest): CreateSensorRouterResponse
+}
+
+class CreateSensorRouterRequest <<DTO>> {
+    + SensorId: int
+    + DatasetId: int
+}
+
+class CreateSensorRouterResponse <<DTO>> {
+    + Id: int
+}
+
+interface ISensorRouterRepository <<Repository>> {
+    + Add(sensorRouter: SensorRouter): void
+    + SaveChanges(): void
+    + GetBySensorId(sensorId: int): IReadOnlyList<SensorRouter>
+}
+
+class SensorRouterRepository <<Repository>> {
+    + Add(sensorRouter: SensorRouter): void
+    + SaveChanges(): void
+    + GetBySensorId(sensorId: int): IReadOnlyList<SensorRouter>
+}
+
+class SensorRouter <<Entity>> {
+    + Id: int
+    + SensorId: int
+    + DatasetId: int
+}
+
+' Relationships
+SensorController ..> ISensorService : uses
+SensorController ..> CreateSensorRouterRequest : receives
+SensorController ..> CreateSensorRouterResponse : returns
+ISensorService <|.. SensorService : implements
+SensorService ..> ISensorRouterRepository : uses
+SensorService ..> CreateSensorRouterRequest : uses
+SensorService ..> CreateSensorRouterResponse : creates
+SensorService ..> SensorRouter : creates
+ISensorRouterRepository <|.. SensorRouterRepository : implements
+SensorRouterRepository ..> SensorRouter : persists
+
+note right of SensorController
+  **HTTP POST** /data/sensor/sensorrouter
+  Creates a new sensor router
+  Status: 201 Created
+end note
+
+@enduml

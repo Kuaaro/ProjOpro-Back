@@ -1,0 +1,109 @@
+@startuml Sensor_SendSensorData_Sequence
+
+' Endpoint: POST /data/sensor/senddata
+' Controller: SensorController
+' Method: SendSensorData
+' Sequence diagram showing the flow of sensor data processing
+
+skinparam sequenceMessageAlign center
+skinparam responseMessageBelowArrow true
+
+actor Client
+participant "SensorController" as Controller <<Controller>>
+participant "SensorService" as Service <<Service>>
+participant "SensorRouterRepository" as SensorRepo <<Repository>>
+participant "DatasetRepository" as DatasetRepo <<Repository>>
+participant "SchemaRepository" as SchemaRepo <<Repository>>
+participant "JsonSchema" as Validator <<External>>
+participant "DataEntryRepository" as DataEntryRepo <<Repository>>
+database "Database" as DB
+
+Client -> Controller: POST /data/sensor/senddata\n{SensorId, Data}
+activate Controller
+
+Controller -> Service: SendSensorData(request)
+activate Service
+
+Service -> SensorRepo: GetBySensorId(sensorId)
+activate SensorRepo
+SensorRepo -> DB: Query SensorRouters
+activate DB
+DB --> SensorRepo: List<SensorRouter>
+deactivate DB
+SensorRepo --> Service: sensorRouters
+deactivate SensorRepo
+
+loop for each sensorRouter
+    Service -> DatasetRepo: GetById(datasetId)
+    activate DatasetRepo
+    DatasetRepo -> DB: Query Dataset
+    activate DB
+    DB --> DatasetRepo: DataSet
+    deactivate DB
+    DatasetRepo --> Service: dataset
+    deactivate DatasetRepo
+    
+    alt dataset is null
+        Service -> Service: continue to next router
+    else dataset found
+        Service -> SchemaRepo: GetById(schemaId)
+        activate SchemaRepo
+        SchemaRepo -> DB: Query Schema
+        activate DB
+        DB --> SchemaRepo: Schema
+        deactivate DB
+        SchemaRepo --> Service: schema
+        deactivate SchemaRepo
+        
+        alt schema is null
+            Service -> Service: continue to next router
+        else schema found
+            Service -> Validator: Build(schema.JsonSchema)
+            activate Validator
+            Validator --> Service: jsonSchema
+            deactivate Validator
+            
+            Service -> Validator: Evaluate(request.Data)
+            activate Validator
+            Validator --> Service: evaluationResult
+            deactivate Validator
+            
+            alt evaluationResult.IsValid
+                Service -> Service: Create DataEntry
+                Service -> DataEntryRepo: Add(dataEntry)
+                activate DataEntryRepo
+                DataEntryRepo --> Service: void
+                deactivate DataEntryRepo
+                note right: Data queued for save
+            else validation failed
+                Service -> Service: Log validation failure
+            end
+        end
+    end
+end
+
+Service -> DataEntryRepo: SaveChanges()
+activate DataEntryRepo
+DataEntryRepo -> DB: Persist all DataEntries
+activate DB
+DB --> DataEntryRepo: Success
+deactivate DB
+DataEntryRepo --> Service: void
+deactivate DataEntryRepo
+
+Service --> Controller: void
+deactivate Service
+
+Controller --> Client: 200 OK
+deactivate Controller
+
+note over Service
+  **Key Points:**
+  - One sensor can route to multiple datasets
+  - Each dataset has its own schema
+  - Data is validated against each schema
+  - Only valid data is saved
+  - All saves happen in single transaction
+end note
+
+@enduml
