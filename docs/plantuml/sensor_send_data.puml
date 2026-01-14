@@ -1,0 +1,147 @@
+@startuml Sensor_SendSensorData_Endpoint
+
+' Endpoint: POST /data/sensor/senddata
+' Controller: SensorController
+' Method: SendSensorData
+
+skinparam classAttributeIconSize 0
+skinparam class {
+    BackgroundColor<<Controller>> LightBlue
+    BackgroundColor<<Service>> LightGreen
+    BackgroundColor<<Repository>> LightYellow
+    BackgroundColor<<Entity>> LightCoral
+    BackgroundColor<<DTO>> LightGray
+}
+
+class SensorController <<Controller>> {
+    + SendSensorData(body: SendSensorDataRequest): void
+}
+
+interface ISensorService <<Service>> {
+    + SendSensorData(request: SendSensorDataRequest): void
+}
+
+class SensorService <<Service>> {
+    + SendSensorData(request: SendSensorDataRequest): void
+}
+
+class SendSensorDataRequest <<DTO>> {
+    + SensorId: int
+    + Data: string
+}
+
+interface ISensorRouterRepository <<Repository>> {
+    + Add(sensorRouter: SensorRouter): void
+    + SaveChanges(): void
+    + GetBySensorId(sensorId: int): IReadOnlyList<SensorRouter>
+}
+
+class SensorRouterRepository <<Repository>> {
+    + Add(sensorRouter: SensorRouter): void
+    + SaveChanges(): void
+    + GetBySensorId(sensorId: int): IReadOnlyList<SensorRouter>
+}
+
+interface IDatasetRepository <<Repository>> {
+    + GetByParentId(parentId: int): IReadOnlyList<DataSet>
+    + GetById(id: int): DataSet?
+    + GetByName(name: string): DataSet?
+    + Add(dataset: DataSet): void
+    + SaveChanges(): void
+}
+
+class DatasetRepository <<Repository>> {
+    + GetByParentId(parentId: int): IReadOnlyList<DataSet>
+    + GetById(id: int): DataSet?
+    + GetByName(name: string): DataSet?
+    + Add(dataset: DataSet): void
+    + SaveChanges(): void
+}
+
+interface ISchemaRepository <<Repository>> {
+    + Add(schema: Schema): void
+    + GetAll(): List<Schema>
+    + GetById(id: int): Schema?
+    + SaveChanges(): void
+}
+
+class SchemaRepository <<Repository>> {
+    + Add(schema: Schema): void
+    + GetAll(): List<Schema>
+    + GetById(id: int): Schema?
+    + SaveChanges(): void
+}
+
+interface IDataEntryRepository <<Repository>> {
+    + GetByDatasetId(datasetId: int): List<DataEntry>
+    + Add(dataEntry: DataEntry): void
+    + SaveChanges(): void
+}
+
+class DataEntryRepository <<Repository>> {
+    + GetByDatasetId(datasetId: int): List<DataEntry>
+    + Add(dataEntry: DataEntry): void
+    + SaveChanges(): void
+}
+
+class SensorRouter <<Entity>> {
+    + Id: int
+    + SensorId: int
+    + DatasetId: int
+}
+
+class DataSet <<Entity>> {
+    + Id: int
+    + Name: string
+    + Description: string?
+    + ContactPoint: string?
+    + SchemaId: int
+    + Schema: Schema?
+    + Distribution: List<Distribution>
+    + Keywords: List<string>
+    + ParentId: int
+}
+
+class Schema <<Entity>> {
+    + Id: int
+    + Name: string
+    + JsonSchema: string
+    + DataSets: List<DataSet>
+}
+
+class DataEntry <<Entity>> {
+    + Id: int
+    + DatasetId: int
+    + DataSet: DataSet?
+    + Data: string
+}
+
+' Relationships
+SensorController ..> ISensorService : uses
+SensorController ..> SendSensorDataRequest : receives
+ISensorService <|.. SensorService : implements
+SensorService ..> ISensorRouterRepository : uses
+SensorService ..> IDatasetRepository : uses
+SensorService ..> ISchemaRepository : uses
+SensorService ..> IDataEntryRepository : uses
+SensorService ..> SendSensorDataRequest : uses
+SensorService ..> DataEntry : creates
+ISensorRouterRepository <|.. SensorRouterRepository : implements
+SensorRouterRepository ..> SensorRouter : retrieves
+IDatasetRepository <|.. DatasetRepository : implements
+DatasetRepository ..> DataSet : retrieves
+ISchemaRepository <|.. SchemaRepository : implements
+SchemaRepository ..> Schema : retrieves
+IDataEntryRepository <|.. DataEntryRepository : implements
+DataEntryRepository ..> DataEntry : persists
+DataEntry "*" --> "1" DataSet : belongs to
+DataSet "*" --> "1" Schema : references
+
+note right of SensorController
+  **HTTP POST** /data/sensor/senddata
+  Sends sensor data and validates against schema
+  Creates data entry if validation passes
+  Status: 200 OK
+end note
+
+@enduml

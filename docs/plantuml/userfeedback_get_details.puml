@@ -1,0 +1,74 @@
+@startuml UserFeedback_GetUserFeedbackDetails_Endpoint
+
+' Endpoint: GET /community/userfeedback/{userFeedbackId}
+' Controller: UserFeedbackController
+' Method: GetUserFeedbackDetails
+
+skinparam classAttributeIconSize 0
+skinparam class {
+    BackgroundColor<<Controller>> LightBlue
+    BackgroundColor<<Service>> LightGreen
+    BackgroundColor<<Repository>> LightYellow
+    BackgroundColor<<Entity>> LightCoral
+    BackgroundColor<<DTO>> LightGray
+}
+
+class UserFeedbackController <<Controller>> {
+    + GetUserFeedbackDetails(userFeedbackId: int): GetUserFeedbackDetails
+}
+
+interface IUserFeedbackService <<Service>> {
+    + GetUserFeedback(id: int): GetUserFeedbackDetails
+}
+
+class UserFeedbackService <<Service>> {
+    + GetUserFeedback(id: int): GetUserFeedbackDetails
+}
+
+class GetUserFeedbackDetails <<DTO>> {
+    + UserFeedbackId: int
+    + ContactPoint: string
+    + Message: string
+    + DatasetId: int
+}
+
+interface IUserFeedbackRepository <<Repository>> {
+    + Add(userFeedback: UserFeedback): void
+    + GetById(userFeedbackId: int): UserFeedback?
+    + GetByDatasetId(datasetId: int): List<UserFeedback>
+    + Delete(feedback: UserFeedback): void
+    + SaveChanges(): void
+}
+
+class UserFeedbackRepository <<Repository>> {
+    + Add(userFeedback: UserFeedback): void
+    + GetById(userFeedbackId: int): UserFeedback?
+    + GetByDatasetId(datasetId: int): List<UserFeedback>
+    + Delete(feedback: UserFeedback): void
+    + SaveChanges(): void
+}
+
+class UserFeedback <<Entity>> {
+    + UserFeedbackId: int
+    + ContactPoint: string
+    + Message: string
+    + DatasetId: int
+}
+
+' Relationships
+UserFeedbackController ..> IUserFeedbackService : uses
+UserFeedbackController ..> GetUserFeedbackDetails : returns
+IUserFeedbackService <|.. UserFeedbackService : implements
+UserFeedbackService ..> IUserFeedbackRepository : uses
+UserFeedbackService ..> GetUserFeedbackDetails : creates
+UserFeedbackService ..> UserFeedback : uses
+IUserFeedbackRepository <|.. UserFeedbackRepository : implements
+UserFeedbackRepository ..> UserFeedback : retrieves
+
+note right of UserFeedbackController
+  **HTTP GET** /community/userfeedback/{userFeedbackId}
+  Gets details of a user feedback
+  Status: 200 OK or 404 Not Found
+end note
+
+@enduml

@@ -1,0 +1,65 @@
+@startuml UserFeedback_DeleteUserFeedback_Endpoint
+
+' Endpoint: DELETE /community/userfeedback/{userFeedbackId}
+' Controller: UserFeedbackController
+' Method: DeleteUserFeedback
+
+skinparam classAttributeIconSize 0
+skinparam class {
+    BackgroundColor<<Controller>> LightBlue
+    BackgroundColor<<Service>> LightGreen
+    BackgroundColor<<Repository>> LightYellow
+    BackgroundColor<<Entity>> LightCoral
+    BackgroundColor<<DTO>> LightGray
+}
+
+class UserFeedbackController <<Controller>> {
+    + DeleteUserFeedback(userFeedbackId: int): void
+}
+
+interface IUserFeedbackService <<Service>> {
+    + DeleteUserFeedback(userFeedbackId: int): void
+}
+
+class UserFeedbackService <<Service>> {
+    + DeleteUserFeedback(userFeedbackId: int): void
+}
+
+interface IUserFeedbackRepository <<Repository>> {
+    + Add(userFeedback: UserFeedback): void
+    + GetById(userFeedbackId: int): UserFeedback?
+    + GetByDatasetId(datasetId: int): List<UserFeedback>
+    + Delete(feedback: UserFeedback): void
+    + SaveChanges(): void
+}
+
+class UserFeedbackRepository <<Repository>> {
+    + Add(userFeedback: UserFeedback): void
+    + GetById(userFeedbackId: int): UserFeedback?
+    + GetByDatasetId(datasetId: int): List<UserFeedback>
+    + Delete(feedback: UserFeedback): void
+    + SaveChanges(): void
+}
+
+class UserFeedback <<Entity>> {
+    + UserFeedbackId: int
+    + ContactPoint: string
+    + Message: string
+    + DatasetId: int
+}
+
+' Relationships
+UserFeedbackController ..> IUserFeedbackService : uses
+IUserFeedbackService <|.. UserFeedbackService : implements
+UserFeedbackService ..> IUserFeedbackRepository : uses
+UserFeedbackService ..> UserFeedback : deletes
+IUserFeedbackRepository <|.. UserFeedbackRepository : implements
+UserFeedbackRepository ..> UserFeedback : removes
+
+note right of UserFeedbackController
+  **HTTP DELETE** /community/userfeedback/{userFeedbackId}
+  Deletes a user feedback
+  Status: 204 No Content
+end note
+
+@enduml

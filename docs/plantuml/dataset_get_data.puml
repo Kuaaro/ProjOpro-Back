@@ -1,0 +1,75 @@
+@startuml Dataset_GetDatasetData_Endpoint
+
+' Endpoint: GET /datasets/data/{id}
+' Controller: DatasetController
+' Method: GetDatasetData
+
+skinparam classAttributeIconSize 0
+skinparam class {
+    BackgroundColor<<Controller>> LightBlue
+    BackgroundColor<<Service>> LightGreen
+    BackgroundColor<<Repository>> LightYellow
+    BackgroundColor<<Entity>> LightCoral
+    BackgroundColor<<DTO>> LightGray
+}
+
+class DatasetController <<Controller>> {
+    + GetDatasetData(id: int): List<DataEntry>
+}
+
+interface IDatasetService <<Service>> {
+    + GetDatasetData(datasetId: int): List<DataEntry>
+}
+
+class DatasetService <<Service>> {
+    + GetDatasetData(datasetId: int): List<DataEntry>
+}
+
+interface IDataEntryRepository <<Repository>> {
+    + GetByDatasetId(datasetId: int): List<DataEntry>
+    + Add(dataEntry: DataEntry): void
+    + SaveChanges(): void
+}
+
+class DataEntryRepository <<Repository>> {
+    + GetByDatasetId(datasetId: int): List<DataEntry>
+    + Add(dataEntry: DataEntry): void
+    + SaveChanges(): void
+}
+
+class DataEntry <<Entity>> {
+    + Id: int
+    + DatasetId: int
+    + DataSet: DataSet?
+    + Data: string
+}
+
+class DataSet <<Entity>> {
+    + Id: int
+    + Name: string
+    + Description: string?
+    + ContactPoint: string?
+    + SchemaId: int
+    + Schema: Schema?
+    + Distribution: List<Distribution>
+    + Keywords: List<string>
+    + ParentId: int
+}
+
+' Relationships
+DatasetController ..> IDatasetService : uses
+DatasetController ..> DataEntry : returns
+IDatasetService <|.. DatasetService : implements
+DatasetService ..> IDataEntryRepository : uses
+DatasetService ..> DataEntry : returns
+IDataEntryRepository <|.. DataEntryRepository : implements
+DataEntryRepository ..> DataEntry : retrieves
+DataEntry "*" --> "1" DataSet : belongs to
+
+note right of DatasetController
+  **HTTP GET** /datasets/data/{id}
+  Gets all data entries for a dataset
+  Status: 200 OK
+end note
+
+@enduml

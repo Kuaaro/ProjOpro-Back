@@ -1,0 +1,78 @@
+@startuml UserFeedback_GetUserFeedbackList_Endpoint
+
+' Endpoint: GET /community/userfeedback/list/{datasetId}
+' Controller: UserFeedbackController
+' Method: GetUserFeedbackList
+
+skinparam classAttributeIconSize 0
+skinparam class {
+    BackgroundColor<<Controller>> LightBlue
+    BackgroundColor<<Service>> LightGreen
+    BackgroundColor<<Repository>> LightYellow
+    BackgroundColor<<Entity>> LightCoral
+    BackgroundColor<<DTO>> LightGray
+}
+
+class UserFeedbackController <<Controller>> {
+    + GetUserFeedbackList(datasetId: int): GetUserFeedbackList
+}
+
+interface IUserFeedbackService <<Service>> {
+    + GetUserFeedbackList(datasetId: int): GetUserFeedbackList
+}
+
+class UserFeedbackService <<Service>> {
+    + GetUserFeedbackList(datasetId: int): GetUserFeedbackList
+}
+
+class GetUserFeedbackList <<DTO>> {
+    + NameIdPairs: List<NameIdPair>
+}
+
+class NameIdPair <<DTO>> {
+    + Id: int
+    + Name: string
+}
+
+interface IUserFeedbackRepository <<Repository>> {
+    + Add(userFeedback: UserFeedback): void
+    + GetById(userFeedbackId: int): UserFeedback?
+    + GetByDatasetId(datasetId: int): List<UserFeedback>
+    + Delete(feedback: UserFeedback): void
+    + SaveChanges(): void
+}
+
+class UserFeedbackRepository <<Repository>> {
+    + Add(userFeedback: UserFeedback): void
+    + GetById(userFeedbackId: int): UserFeedback?
+    + GetByDatasetId(datasetId: int): List<UserFeedback>
+    + Delete(feedback: UserFeedback): void
+    + SaveChanges(): void
+}
+
+class UserFeedback <<Entity>> {
+    + UserFeedbackId: int
+    + ContactPoint: string
+    + Message: string
+    + DatasetId: int
+}
+
+' Relationships
+UserFeedbackController ..> IUserFeedbackService : uses
+UserFeedbackController ..> GetUserFeedbackList : returns
+IUserFeedbackService <|.. UserFeedbackService : implements
+UserFeedbackService ..> IUserFeedbackRepository : uses
+UserFeedbackService ..> GetUserFeedbackList : creates
+UserFeedbackService ..> NameIdPair : creates
+UserFeedbackService ..> UserFeedback : uses
+GetUserFeedbackList *-- NameIdPair : contains
+IUserFeedbackRepository <|.. UserFeedbackRepository : implements
+UserFeedbackRepository ..> UserFeedback : retrieves
+
+note right of UserFeedbackController
+  **HTTP GET** /community/userfeedback/list/{datasetId}
+  Gets list of user feedbacks for a dataset
+  Status: 200 OK
+end note
+
+@enduml

@@ -1,0 +1,79 @@
+@startuml UserFeedback_CreateUserFeedback_Endpoint
+
+' Endpoint: POST /community/userfeedback
+' Controller: UserFeedbackController
+' Method: CreateUserFeedback
+
+skinparam classAttributeIconSize 0
+skinparam class {
+    BackgroundColor<<Controller>> LightBlue
+    BackgroundColor<<Service>> LightGreen
+    BackgroundColor<<Repository>> LightYellow
+    BackgroundColor<<Entity>> LightCoral
+    BackgroundColor<<DTO>> LightGray
+}
+
+class UserFeedbackController <<Controller>> {
+    + CreateUserFeedback(body: CreateUserFeedbackRequest): CreateUserFeedbackResponse
+}
+
+interface IUserFeedbackService <<Service>> {
+    + CreateFeedback(request: CreateUserFeedbackRequest): CreateUserFeedbackResponse
+}
+
+class UserFeedbackService <<Service>> {
+    + CreateFeedback(request: CreateUserFeedbackRequest): CreateUserFeedbackResponse
+}
+
+class CreateUserFeedbackRequest <<DTO>> {
+    + ContactPoint: string
+    + Message: string
+    + DatasetId: int
+}
+
+class CreateUserFeedbackResponse <<DTO>> {
+    + UserFeedbackId: int
+}
+
+interface IUserFeedbackRepository <<Repository>> {
+    + Add(userFeedback: UserFeedback): void
+    + GetById(userFeedbackId: int): UserFeedback?
+    + GetByDatasetId(datasetId: int): List<UserFeedback>
+    + Delete(feedback: UserFeedback): void
+    + SaveChanges(): void
+}
+
+class UserFeedbackRepository <<Repository>> {
+    + Add(userFeedback: UserFeedback): void
+    + GetById(userFeedbackId: int): UserFeedback?
+    + GetByDatasetId(datasetId: int): List<UserFeedback>
+    + Delete(feedback: UserFeedback): void
+    + SaveChanges(): void
+}
+
+class UserFeedback <<Entity>> {
+    + UserFeedbackId: int
+    + ContactPoint: string
+    + Message: string
+    + DatasetId: int
+}
+
+' Relationships
+UserFeedbackController ..> IUserFeedbackService : uses
+UserFeedbackController ..> CreateUserFeedbackRequest : receives
+UserFeedbackController ..> CreateUserFeedbackResponse : returns
+IUserFeedbackService <|.. UserFeedbackService : implements
+UserFeedbackService ..> IUserFeedbackRepository : uses
+UserFeedbackService ..> CreateUserFeedbackRequest : uses
+UserFeedbackService ..> CreateUserFeedbackResponse : creates
+UserFeedbackService ..> UserFeedback : creates
+IUserFeedbackRepository <|.. UserFeedbackRepository : implements
+UserFeedbackRepository ..> UserFeedback : persists
+
+note right of UserFeedbackController
+  **HTTP POST** /community/userfeedback
+  Creates a new user feedback
+  Status: 201 Created
+end note
+
+@enduml
